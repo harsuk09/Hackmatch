@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathons - HackMatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <a href="index.html"><span>HackMatch</span></a>
+            </div>
+            <div class="nav-search">
+                <input type="text" placeholder="Search hackathons..." id="searchInput">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="hackathons.html" class="active">Hackathons</a>
+                <a href="profile.html">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </a>
+                <button class="btn-logout" id="logoutBtn">Logout</button>
+            </div>
+            <div class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hackathons Content -->
+    <div class="hackathons-container">
+        <div class="container">
+            <div class="page-header fade-in">
+                <div class="header-with-button">
+                    <div>
+                        <h1><i class="fas fa-calendar-alt"></i> Upcoming Hackathons</h1>
+                        <p>Discover and join the best hackathons happening around the world</p>
+                    </div>
+                    <a href="createHackathon.html" class="btn-primary btn-glow">
+                        <i class="fas fa-plus"></i> Create Hackathon
+                    </a>
+                </div>
+            </div>
+            <div class="hackathons-grid" id="hackathonsGrid">
+                <!-- Hackathons will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+

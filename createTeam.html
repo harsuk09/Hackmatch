@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Team - HackMatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <a href="index.html"><span>HackMatch</span></a>
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="hackathons.html">Hackathons</a>
+                <a href="profile.html">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Create Team Form -->
+    <div class="form-container">
+        <div class="form-card fade-in">
+            <div class="form-header">
+                <h1><i class="fas fa-users"></i> Create New Team</h1>
+                <p>Build your dream hackathon team</p>
+            </div>
+            <form id="createTeamForm" class="form-content">
+                <div class="form-group">
+                    <label for="teamName">Team Name *</label>
+                    <input type="text" id="teamName" name="teamName" required placeholder="e.g., Code Ninjas">
+                    <i class="fas fa-tag input-icon"></i>
+                </div>
+                <div class="form-group">
+                    <label for="teamDescription">Team Description *</label>
+                    <textarea id="teamDescription" name="teamDescription" rows="5" required placeholder="Describe your team's mission, goals, and what you're looking for..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="requiredSkills">Required Skills *</label>
+                    <div class="tags-input-container">
+                        <div class="tags-display" id="skillsTagsDisplay">
+                            <!-- Tags will appear here -->
+                        </div>
+                        <input type="text" id="requiredSkills" placeholder="Type a skill and press Enter (e.g., React, Python, UI/UX)">
+                    </div>
+                    <small>Press Enter to add each skill</small>
+                </div>
+                <div class="form-group">
+                    <label for="maxMembers">Maximum Members *</label>
+                    <input type="number" id="maxMembers" name="maxMembers" min="2" max="10" required value="4">
+                    <i class="fas fa-users input-icon"></i>
+                </div>
+                <div class="form-group">
+                    <label for="hackathon">Associated Hackathon (Optional)</label>
+                    <select id="hackathon" name="hackathon">
+                        <option value="">Select a hackathon...</option>
+                        <!-- Hackathons will be loaded dynamically -->
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <a href="dashboard.html" class="btn-secondary">Cancel</a>
+                    <button type="submit" class="btn-primary btn-glow">
+                        <i class="fas fa-rocket"></i> Create Team
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+

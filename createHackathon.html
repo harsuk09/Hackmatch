@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Hackathon - HackMatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <a href="index.html"><span>HackMatch</span></a>
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="hackathons.html">Hackathons</a>
+                <a href="profile.html">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Create Hackathon Form -->
+    <div class="form-container">
+        <div class="form-card fade-in">
+            <div class="form-header">
+                <h1><i class="fas fa-calendar-plus"></i> Create New Hackathon</h1>
+                <p>Host your own hackathon and bring innovators together</p>
+            </div>
+            <form id="createHackathonForm" class="form-content">
+                <div class="form-group">
+                    <label for="hackathonName">Hackathon Name *</label>
+                    <input type="text" id="hackathonName" name="hackathonName" required placeholder="e.g., Tech Innovation Challenge 2025">
+                    <i class="fas fa-trophy input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description *</label>
+                    <textarea id="description" name="description" rows="5" required placeholder="Describe your hackathon's theme, goals, and what participants can expect..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="organizer">Organizer *</label>
+                    <input type="text" id="organizer" name="organizer" required placeholder="Organization or company name">
+                    <i class="fas fa-building input-icon"></i>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="startDate">Start Date *</label>
+                        <input type="datetime-local" id="startDate" name="startDate" required>
+                        <i class="fas fa-calendar input-icon"></i>
+                    </div>
+                    <div class="form-group half">
+                        <label for="endDate">End Date *</label>
+                        <input type="datetime-local" id="endDate" name="endDate" required>
+                        <i class="fas fa-calendar input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="registrationDeadline">Registration Deadline *</label>
+                    <input type="datetime-local" id="registrationDeadline" name="registrationDeadline" required>
+                    <i class="fas fa-clock input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location *</label>
+                    <input type="text" id="location" name="location" required placeholder="City, Country or Online">
+                    <i class="fas fa-map-marker-alt input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="isOnline" name="isOnline">
+                        This is an online hackathon
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="website">Website URL (Optional)</label>
+                    <input type="url" id="website" name="website" placeholder="https://yourhackathon.com">
+                    <i class="fas fa-globe input-icon"></i>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="minTeamSize">Min Team Size *</label>
+                        <input type="number" id="minTeamSize" name="minTeamSize" min="2" max="5" required value="2">
+                        <i class="fas fa-users input-icon"></i>
+                    </div>
+                    <div class="form-group half">
+                        <label for="maxTeamSize">Max Team Size *</label>
+                        <input type="number" id="maxTeamSize" name="maxTeamSize" min="2" max="10" required value="5">
+                        <i class="fas fa-users input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="categories">Categories *</label>
+                    <div class="tags-input-container">
+                        <div class="tags-display" id="categoriesTagsDisplay">
+                            <!-- Tags will appear here -->
+                        </div>
+                        <input type="text" id="categories" placeholder="Type a category and press Enter (e.g., AI, Blockchain, IoT)">
+                    </div>
+                    <small>Press Enter to add each category</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags (Optional)</label>
+                    <div class="tags-input-container">
+                        <div class="tags-display" id="tagsTagsDisplay">
+                            <!-- Tags will appear here -->
+                        </div>
+                        <input type="text" id="tags" placeholder="Type a tag and press Enter">
+                    </div>
+                    <small>Press Enter to add each tag</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="prize">Prize Details (Optional)</label>
+                    <input type="text" id="prize" name="prize" placeholder="e.g., $5000 in prizes, Mentorship opportunities">
+                    <i class="fas fa-award input-icon"></i>
+                </div>
+
+                <div class="form-actions">
+                    <a href="hackathons.html" class="btn-secondary">Cancel</a>
+                    <button type="submit" class="btn-primary btn-glow">
+                        <i class="fas fa-rocket"></i> Create Hackathon
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

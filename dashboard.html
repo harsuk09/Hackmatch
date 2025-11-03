@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HackMatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <a href="index.html"><span>HackMatch</span></a>
+            </div>
+            <div class="nav-search">
+                <input type="text" placeholder="Search teams, hackathons..." id="searchInput">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="hackathons.html">Hackathons</a>
+                <a href="profile.html" class="nav-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">User</span>
+                </a>
+                <button class="btn-logout" id="logoutBtn">Logout</button>
+            </div>
+            <div class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <div class="dashboard-header fade-in">
+            <h1>Welcome back, <span id="dashboardUserName">Hacker</span>!</h1>
+            <a href="createTeam.html" class="btn-primary">
+                <i class="fas fa-plus"></i> Create Team
+            </a>
+        </div>
+
+        <!-- Recommended Teams Section -->
+        <section class="dashboard-section fade-in">
+            <div class="section-header">
+                <h2><i class="fas fa-lightbulb"></i> Recommended Teams</h2>
+                <p>Teams that match your skills and interests</p>
+            </div>
+            <div class="teams-grid" id="recommendedTeams">
+                <!-- Teams will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <!-- Your Teams Section -->
+        <section class="dashboard-section fade-in">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Your Teams</h2>
+                <p>Teams you're currently part of</p>
+            </div>
+            <div class="teams-grid" id="yourTeams">
+                <!-- Teams will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <!-- Upcoming Hackathons Section -->
+        <section class="dashboard-section fade-in">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-alt"></i> Upcoming Hackathons</h2>
+                <p>Hackathons you might be interested in</p>
+            </div>
+            <div class="hackathons-grid" id="upcomingHackathons">
+                <!-- Hackathons will be dynamically inserted here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+

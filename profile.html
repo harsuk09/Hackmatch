@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - HackMatch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-rocket"></i>
+                <a href="index.html"><span>HackMatch</span></a>
+            </div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="hackathons.html">Hackathons</a>
+                <a href="profile.html" class="active">Profile</a>
+                <button class="btn-logout" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Content -->
+    <div class="profile-container">
+        <div class="profile-card fade-in">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                    <button class="btn-avatar-edit" title="Change Avatar">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                </div>
+                <div class="profile-info-header">
+                    <h1 id="profileName">Your Name</h1>
+                    <p id="profileEmail">your.email@example.com</p>
+                </div>
+            </div>
+            <form id="profileForm" class="profile-form">
+                <div class="form-section">
+                    <h2><i class="fas fa-user"></i> Personal Information</h2>
+                    <div class="form-group">
+                        <label for="profileNameInput">Full Name</label>
+                        <input type="text" id="profileNameInput" name="name" required>
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileEmailInput">Email</label>
+                        <input type="email" id="profileEmailInput" name="email" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h2><i class="fas fa-code"></i> Skills</h2>
+                    <div class="tags-input-container">
+                        <div class="tags-display" id="profileSkillsTagsDisplay">
+                            <!-- Tags will appear here -->
+                        </div>
+                        <input type="text" id="profileSkills" placeholder="Type a skill and press Enter">
+                    </div>
+                    <small>Add your technical skills and expertise</small>
+                </div>
+                <div class="form-section">
+                    <h2><i class="fas fa-heart"></i> Interests</h2>
+                    <div class="tags-input-container">
+                        <div class="tags-display" id="profileInterestsTagsDisplay">
+                            <!-- Tags will appear here -->
+                        </div>
+                        <input type="text" id="profileInterests" placeholder="Type an interest and press Enter">
+                    </div>
+                    <small>Add topics you're passionate about</small>
+                </div>
+                <div class="form-section">
+                    <h2><i class="fas fa-calendar"></i> Availability</h2>
+                    <div class="form-group">
+                        <label for="availability">Availability Status</label>
+                        <select id="availability" name="availability">
+                            <option value="available">Available</option>
+                            <option value="busy">Busy</option>
+                            <option value="looking">Looking for Team</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <a href="dashboard.html" class="btn-secondary">Back to Dashboard</a>
+                    <button type="submit" class="btn-primary btn-glow">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
+
