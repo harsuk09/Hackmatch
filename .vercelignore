@@ -1,0 +1,9 @@
+# Ignore files that should not be uploaded to Vercel
+node_modules
+.env
+.git
+*.log
+logs
+/.vscode
+.DS_Store
+frontend/node_modules
