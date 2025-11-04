@@ -40,10 +40,18 @@ async function apiRequest(endpoint, options = {}) {
 // ===== AUTH API =====
 const authAPI = {
     async register(userData) {
-        return apiRequest('/auth/register', {
+        const response = await apiRequest('/auth/register', {
             method: 'POST',
             body: JSON.stringify(userData)
         });
+
+        // If backend returns a token on registration, persist it like login does
+        if (response && response.token) {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('currentUser', JSON.stringify(response.user));
+        }
+
+        return response;
     },
 
     async login(email, password) {
