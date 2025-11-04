@@ -11,7 +11,10 @@ window.config = window.config || {};
 // 3) derive from location for local dev (assume backend on port 5000)
 // 4) fallback to http://localhost:5000/api
 window.config.API_BASE_URL = window.config.API_BASE_URL || window.API_URL || (
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? `${window.location.protocol}//${window.location.hostname}:5000/api`
-    : '/api'
+  // If page is opened via file://, default to localhost backend
+  (window.location.protocol === 'file:'
+    ? 'http://localhost:5000/api'
+    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? `${window.location.protocol}//${window.location.hostname}:5000/api`
+      : '/api')
 );

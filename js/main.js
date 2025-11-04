@@ -519,7 +519,13 @@ async function handleSignup(e) {
             window.location.href = 'dashboard.html';
         }, 1000);
     } catch (error) {
-        showToast(error.message || 'Failed to create account', 'error');
+        console.error('Signup error:', error);
+        // If network error or CORS, provide actionable message
+        if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('Failed to execute'))) {
+            showToast('Network error: could not reach backend. Are you serving the frontend over http? See README.', 'error');
+        } else {
+            showToast(error.message || 'Failed to create account', 'error');
+        }
     }
 }
 
