@@ -8,6 +8,10 @@ const {
   leaveTeam,
   updateTeam,
   deleteTeam,
+  requestToJoin,
+  getJoinRequests,
+  approveRequest,
+  rejectRequest,
   removeMember
 } = require('../controllers/teamController');
 const { protect } = require('../middleware/auth');
@@ -22,6 +26,10 @@ router.route('/:id')
   .delete(protect, deleteTeam);
 
 router.post('/:id/join', protect, joinTeam);
+router.post('/:id/request', protect, requestToJoin);
+router.get('/:id/requests', protect, getJoinRequests);
+router.post('/:id/requests/:requestId/approve', protect, approveRequest);
+router.post('/:id/requests/:requestId/reject', protect, rejectRequest);
 router.post('/:id/leave', protect, leaveTeam);
 router.delete('/:id/members/:memberId', protect, removeMember);
 

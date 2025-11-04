@@ -74,6 +74,24 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Notifications stored on user for simple in-app alerts
+userSchema.add({
+  notifications: [
+    {
+      type: {
+        type: String,
+        enum: ['team_request', 'message', 'system'],
+        default: 'system'
+      },
+      message: { type: String },
+      from: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
+      read: { type: Boolean, default: false },
+      createdAt: { type: Date, default: Date.now }
+    }
+  ]
+});
+
 // Hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {

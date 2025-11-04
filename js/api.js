@@ -96,6 +96,15 @@ const userAPI = {
         const queryString = new URLSearchParams(filters).toString();
         return apiRequest(`/users/search?${queryString}`);
     }
+    ,
+    // Notifications
+    async getNotifications() {
+        return apiRequest('/users/notifications');
+    },
+
+    async markNotificationRead(notificationId) {
+        return apiRequest(`/users/notifications/${notificationId}/read`, { method: 'POST' });
+    }
 };
 
 // ===== TEAM API =====
@@ -133,6 +142,26 @@ const teamAPI = {
         return apiRequest(`/teams/${teamId}/join`, {
             method: 'POST'
         });
+    },
+
+    // Request to join a team (creates a pending request)
+    async requestToJoin(teamId, message = '') {
+        return apiRequest(`/teams/${teamId}/request`, {
+            method: 'POST',
+            body: JSON.stringify({ message })
+        });
+    },
+
+    async getJoinRequests(teamId) {
+        return apiRequest(`/teams/${teamId}/requests`);
+    },
+
+    async approveRequest(teamId, requestId) {
+        return apiRequest(`/teams/${teamId}/requests/${requestId}/approve`, { method: 'POST' });
+    },
+
+    async rejectRequest(teamId, requestId) {
+        return apiRequest(`/teams/${teamId}/requests/${requestId}/reject`, { method: 'POST' });
     },
 
     async leaveTeam(teamId) {

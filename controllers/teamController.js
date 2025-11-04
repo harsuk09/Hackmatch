@@ -224,6 +224,157 @@ exports.joinTeam = async (req, res, next) => {
   }
 };
 
+// @desc    Request to join a team (creates a pending request for leader approval)
+// @route   POST /api/teams/:id/request
+// @access  Private
+exports.requestToJoin = async (req, res, next) => {
+  try {
+    const team = await Team.findById(req.params.id).populate('leader', 'name email');
+
+    if (!team) {
+      return res.status(404).json({ success: false, message: 'Team not found' });
+    }
+
+    // Prevent leader or existing members from requesting
+    if (team.leader.toString() === req.user.id.toString() || team.members.includes(req.user.id)) {
+      return res.status(400).json({ success: false, message: 'You are already part of this team' });
+    }
+
+    // Prevent duplicate requests
+    const alreadyRequested = team.pendingRequests.some(r => r.user.toString() === req.user.id.toString());
+    if (alreadyRequested) {
+      return res.status(400).json({ success: false, message: 'You have already requested to join this team' });
+    }
+
+    // Add request
+    const request = { user: req.user.id, message: req.body.message || '' };
+    team.pendingRequests.push(request);
+    await team.save();
+
+    // Notify team leader
+    const leader = await require('../models/User').findById(team.leader);
+    if (leader) {
+      leader.notifications = leader.notifications || [];
+      leader.notifications.push({
+        type: 'team_request',
+        message: `${req.user.name || req.user.email} has requested to join your team '${team.name}'`,
+        from: req.user.id,
+        team: team._id,
+        read: false,
+        createdAt: new Date()
+      });
+      await leader.save();
+    }
+
+    res.status(201).json({ success: true, message: 'Request sent to team leader' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get pending join requests for a team
+// @route   GET /api/teams/:id/requests
+// @access  Private (leader only)
+exports.getJoinRequests = async (req, res, next) => {
+  try {
+    const team = await Team.findById(req.params.id).populate('pendingRequests.user', 'name email avatar');
+    if (!team) return res.status(404).json({ success: false, message: 'Team not found' });
+    if (team.leader.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ success: false, message: 'Only team leader can view requests' });
+    }
+    res.status(200).json({ success: true, requests: team.pendingRequests });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Approve a join request
+// @route   POST /api/teams/:id/requests/:requestId/approve
+// @access  Private (leader only)
+exports.approveRequest = async (req, res, next) => {
+  try {
+    const team = await Team.findById(req.params.id);
+    if (!team) return res.status(404).json({ success: false, message: 'Team not found' });
+    if (team.leader.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ success: false, message: 'Only team leader can approve requests' });
+    }
+
+    const reqIndex = team.pendingRequests.findIndex(r => r._id.toString() === req.params.requestId);
+    if (reqIndex === -1) return res.status(404).json({ success: false, message: 'Request not found' });
+
+    const request = team.pendingRequests[reqIndex];
+
+    // Add as member if not already
+    if (!team.members.includes(request.user)) {
+      team.members.push(request.user);
+    }
+
+    // Remove from pending
+    team.pendingRequests.splice(reqIndex, 1);
+    await team.save();
+
+    // Notify requester
+    const User = require('../models/User');
+    const requester = await User.findById(request.user);
+    if (requester) {
+      requester.notifications = requester.notifications || [];
+      requester.notifications.push({
+        type: 'team_request',
+        message: `Your request to join '${team.name}' has been approved`,
+        from: req.user.id,
+        team: team._id,
+        read: false,
+        createdAt: new Date()
+      });
+      await requester.save();
+    }
+
+    res.status(200).json({ success: true, message: 'Request approved', team });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reject a join request
+// @route   POST /api/teams/:id/requests/:requestId/reject
+// @access  Private (leader only)
+exports.rejectRequest = async (req, res, next) => {
+  try {
+    const team = await Team.findById(req.params.id);
+    if (!team) return res.status(404).json({ success: false, message: 'Team not found' });
+    if (team.leader.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ success: false, message: 'Only team leader can reject requests' });
+    }
+
+    const reqIndex = team.pendingRequests.findIndex(r => r._id.toString() === req.params.requestId);
+    if (reqIndex === -1) return res.status(404).json({ success: false, message: 'Request not found' });
+
+    const request = team.pendingRequests[reqIndex];
+    team.pendingRequests.splice(reqIndex, 1);
+    await team.save();
+
+    // Notify requester
+    const User = require('../models/User');
+    const requester = await User.findById(request.user);
+    if (requester) {
+      requester.notifications = requester.notifications || [];
+      requester.notifications.push({
+        type: 'team_request',
+        message: `Your request to join '${team.name}' was rejected by the team leader`,
+        from: req.user.id,
+        team: team._id,
+        read: false,
+        createdAt: new Date()
+      });
+      await requester.save();
+    }
+
+    res.status(200).json({ success: true, message: 'Request rejected' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Leave a team
 // @route   POST /api/teams/:id/leave
 // @access  Private

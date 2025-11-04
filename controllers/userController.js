@@ -160,3 +160,36 @@ exports.getUsers = async (req, res, next) => {
   }
 };
 
+// @desc    Get notifications for current user
+// @route   GET /api/users/notifications
+// @access  Private
+exports.getNotifications = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select('notifications').populate('notifications.from', 'name email');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({ success: true, notifications: user.notifications || [] });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Mark a notification as read
+// @route   POST /api/users/notifications/:notificationId/read
+// @access  Private
+exports.markNotificationRead = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const notif = user.notifications.id(req.params.notificationId);
+    if (!notif) return res.status(404).json({ success: false, message: 'Notification not found' });
+
+    notif.read = true;
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Notification marked read' });
+  } catch (error) {
+    next(error);
+  }
+};
+

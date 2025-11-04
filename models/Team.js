@@ -60,6 +60,17 @@ const teamSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Pending join requests: stored with reference to user and an optional message
+teamSchema.add({
+  pendingRequests: [
+    {
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      message: { type: String, default: '' },
+      createdAt: { type: Date, default: Date.now }
+    }
+  ]
+});
+
 // Virtual to check if team is full
 teamSchema.virtual('isFull').get(function() {
   return this.members.length >= this.maxMembers;

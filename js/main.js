@@ -3,20 +3,122 @@
    Navigation, Auth, Dynamic Content, Toast Messages
    =================================== */
 
-// ===== GLOBAL VARIABLES =====
-const currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-const users = JSON.parse(localStorage.getItem('users')) || [];
-const teams = JSON.parse(localStorage.getItem('teams')) || [];
-const hackathons = JSON.parse(localStorage.getItem('hackathons')) || [];
+        const response = await API.team.requestToJoin(teamId);
+        showToast(response.message || 'Request sent. Waiting for leader approval.', 'success');
 
-// Sample data for initialization
-const sampleHackathons = [
-    {
-        id: 1,
+        // Optionally refresh dashboard to show pending state
+        if (window.location.pathname.includes('dashboard.html')) {
+            setTimeout(() => {
+                loadDashboard();
+            }, 500);
+        }
         name: 'TechCrunch Disrupt 2024',
         theme: 'AI & Machine Learning',
         date: '2024-03-15',
         location: 'San Francisco, CA',
+
+// Leader: view pending requests and approve/reject
+async function viewRequests(teamId) {
+    try {
+        const res = await API.team.getJoinRequests(teamId);
+        const requests = res.requests || [];
+
+        // Create modal
+        let modal = document.getElementById('requestsModal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'requestsModal';
+        modal.style.position = 'fixed';
+        modal.style.left = '0';
+        modal.style.top = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.background = 'rgba(0,0,0,0.5)';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.zIndex = 10000;
+
+        const panel = document.createElement('div');
+        panel.style.width = '600px';
+        panel.style.maxHeight = '80vh';
+        panel.style.overflowY = 'auto';
+        panel.style.background = '#fff';
+        panel.style.borderRadius = '8px';
+        panel.style.padding = '1rem';
+
+        panel.innerHTML = `<h3>Pending Requests (${requests.length})</h3>`;
+
+        if (requests.length === 0) {
+            const empty = document.createElement('p');
+            empty.textContent = 'No pending requests.';
+            panel.appendChild(empty);
+        } else {
+            requests.forEach(r => {
+                const row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.justifyContent = 'space-between';
+                row.style.alignItems = 'center';
+                row.style.padding = '0.5rem 0';
+                row.style.borderBottom = '1px solid #eee';
+
+                const left = document.createElement('div');
+                left.innerHTML = `<strong>${r.user.name || r.user.email}</strong><div style="font-size:0.9rem;color:#666">${r.message || ''}</div>`;
+
+                const actions = document.createElement('div');
+                const approveBtn = document.createElement('button');
+                approveBtn.className = 'btn-primary btn-small';
+                approveBtn.textContent = 'Approve';
+                approveBtn.style.marginRight = '0.5rem';
+                approveBtn.onclick = async () => {
+                    try {
+                        await API.team.approveRequest(teamId, r._id);
+                        showToast('Request approved', 'success');
+                        modal.remove();
+                        loadDashboard();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to approve', 'error');
+                    }
+                };
+
+                const rejectBtn = document.createElement('button');
+                rejectBtn.className = 'btn-secondary btn-small';
+                rejectBtn.textContent = 'Reject';
+                rejectBtn.onclick = async () => {
+                    try {
+                        await API.team.rejectRequest(teamId, r._id);
+                        showToast('Request rejected', 'success');
+                        modal.remove();
+                        loadDashboard();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to reject', 'error');
+                    }
+                };
+
+                actions.appendChild(approveBtn);
+                actions.appendChild(rejectBtn);
+
+                row.appendChild(left);
+                row.appendChild(actions);
+                panel.appendChild(row);
+            });
+        }
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Close';
+        closeBtn.className = 'btn-secondary';
+        closeBtn.style.marginTop = '1rem';
+        closeBtn.onclick = () => modal.remove();
+        panel.appendChild(closeBtn);
+
+        modal.appendChild(panel);
+        document.body.appendChild(modal);
+
+    } catch (error) {
+        showToast(error.message || 'Failed to load requests', 'error');
+    }
+}
         description: 'Join thousands of developers for a weekend of innovation and collaboration.',
         participants: 2500,
         duration: '48 hours'
@@ -320,7 +422,22 @@ function displayTeams(teamsArray, containerId) {
     if (!container) return;
     
     container.innerHTML = '';
-    
+
+    // If no teams, show a helpful placeholder message
+    if (!Array.isArray(teamsArray) || teamsArray.length === 0) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'empty-placeholder';
+        placeholder.style.padding = '2rem';
+        placeholder.style.textAlign = 'center';
+        placeholder.style.color = '#666';
+        placeholder.style.fontStyle = 'italic';
+        placeholder.textContent = containerId === 'yourTeams'
+            ? "You're not part of any teams yet. Create or join a team to get started."
+            : 'No teams found.';
+        container.appendChild(placeholder);
+        return;
+    }
+
     teamsArray.forEach(team => {
         const teamCard = createTeamCard(team);
         container.appendChild(teamCard);
@@ -365,6 +482,16 @@ function createTeamCard(team) {
             <button class="btn-secondary btn-small" onclick="viewTeam('${teamId}')">
                 <i class="fas fa-eye"></i> View Details
             </button>
+            ${(() => {
+                try {
+                    const leaderId = team.leader && (team.leader._id || team.leader.id || team.leader);
+                    const currentId = currentUser && (currentUser.id || currentUser._id);
+                    if (currentId && leaderId && leaderId.toString() === currentId.toString()) {
+                        return `<button class="btn-secondary btn-small" onclick="viewRequests('${teamId}')">Requests</button>`;
+                    }
+                } catch (e) { /* ignore */ }
+                return '';
+            })()}
         </div>
     `;
     
