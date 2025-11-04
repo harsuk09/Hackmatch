@@ -284,9 +284,26 @@ async function loadDashboard() {
         const teamsResponse = await API.team.getAllTeams({ status: 'open' });
         const recommendedTeams = teamsResponse.teams || teamsResponse;
         displayTeams(Array.isArray(recommendedTeams) ? recommendedTeams.slice(0, 6) : [], 'recommendedTeams');
-        
-        // Load user's teams (mock - would filter by user ID in real app)
-        displayTeams(Array.isArray(recommendedTeams) ? recommendedTeams.slice(0, 2) : [], 'yourTeams');
+
+        // Determine user's teams by checking members for the current user's id/email
+        let userTeams = [];
+        if (currentUser && Array.isArray(recommendedTeams)) {
+            const userId = currentUser.id || currentUser._id || null;
+            const userEmail = currentUser.email || null;
+
+            userTeams = recommendedTeams.filter(team => {
+                if (!team.members || !Array.isArray(team.members)) return false;
+                return team.members.some(member => {
+                    const memberId = member.id || member._id || (member._id && member._id.toString()) || null;
+                    const memberEmail = member.email || null;
+                    if (userId && memberId && memberId.toString() === userId.toString()) return true;
+                    if (userEmail && memberEmail && memberEmail === userEmail) return true;
+                    return false;
+                });
+            });
+        }
+
+        displayTeams(userTeams, 'yourTeams');
         
         // Load upcoming hackathons
         const hackathonsResponse = await API.hackathon.getAllHackathons({ status: 'upcoming' });
