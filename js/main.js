@@ -194,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     checkAuth();
     initializeAnimations();
+    initNotifications();
     
     // Initialize sample data if storage is empty
     if (hackathons.length === 0) {
@@ -235,6 +236,178 @@ function initializeApp() {
             initializeTagInput('profileSkills', 'profileSkillsTagsDisplay');
             initializeTagInput('profileInterests', 'profileInterestsTagsDisplay');
             break;
+    }
+}
+
+// ===== NOTIFICATIONS =====
+let notificationsCache = [];
+let notificationsIntervalId = null;
+
+function initNotifications() {
+    // Create bell UI in nav if not present
+    try {
+        const navLinks = document.querySelector('.nav-links');
+        if (!navLinks) return;
+
+        if (!document.getElementById('notificationsBell')) {
+            const bell = document.createElement('div');
+            bell.id = 'notificationsBell';
+            bell.style.position = 'relative';
+            bell.style.marginLeft = '1rem';
+            bell.innerHTML = `
+                <button id="notifBellBtn" class="btn-icon" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span id="notifCount" style="display:none;position:absolute;top:-6px;right:-6px;background:#ff3b30;color:#fff;border-radius:50%;padding:2px 6px;font-size:12px;">0</span>
+                </button>`;
+
+            navLinks.appendChild(bell);
+
+            document.getElementById('notifBellBtn').addEventListener('click', toggleNotificationsDropdown);
+        }
+
+        // Initial fetch and polling every 30s
+        fetchAndRenderNotifications();
+        if (notificationsIntervalId) clearInterval(notificationsIntervalId);
+        notificationsIntervalId = setInterval(fetchAndRenderNotifications, 30000);
+    } catch (e) {
+        console.error('Failed to init notifications', e);
+    }
+}
+
+async function fetchAndRenderNotifications() {
+    try {
+        if (!localStorage.getItem('token')) return; // only for logged-in users
+        const res = await API.user.getNotifications();
+        const notifications = res.notifications || [];
+        notificationsCache = notifications;
+        renderNotificationsDropdown(notifications);
+    } catch (err) {
+        // silent
+    }
+}
+
+function renderNotificationsDropdown(notifications) {
+    // Remove old dropdown
+    const existing = document.getElementById('notifDropdown');
+    if (existing) existing.remove();
+
+    const dropdown = document.createElement('div');
+    dropdown.id = 'notifDropdown';
+    dropdown.style.position = 'absolute';
+    dropdown.style.right = '0';
+    dropdown.style.top = '48px';
+    dropdown.style.width = '320px';
+    dropdown.style.maxHeight = '400px';
+    dropdown.style.overflowY = 'auto';
+    dropdown.style.background = '#fff';
+    dropdown.style.border = '1px solid #eee';
+    dropdown.style.boxShadow = '0 6px 18px rgba(0,0,0,0.1)';
+    dropdown.style.borderRadius = '8px';
+    dropdown.style.zIndex = 10001;
+
+    const header = document.createElement('div');
+    header.style.padding = '0.75rem 1rem';
+    header.style.borderBottom = '1px solid #f3f3f3';
+    header.innerHTML = `<strong>Notifications</strong>`;
+    dropdown.appendChild(header);
+
+    if (!notifications || notifications.length === 0) {
+        const empty = document.createElement('div');
+        empty.style.padding = '1rem';
+        empty.style.color = '#666';
+        empty.textContent = 'No notifications';
+        dropdown.appendChild(empty);
+    } else {
+        notifications.slice().reverse().forEach(n => {
+            const row = document.createElement('div');
+            row.style.padding = '0.75rem 1rem';
+            row.style.borderBottom = '1px solid #f7f7f7';
+            row.style.display = 'flex';
+            row.style.justifyContent = 'space-between';
+            row.style.alignItems = 'flex-start';
+
+            const left = document.createElement('div');
+            left.style.flex = '1';
+            left.innerHTML = `<div style="font-size:0.95rem">${n.message}</div><div style="font-size:0.8rem;color:#888;margin-top:4px">${new Date(n.createdAt).toLocaleString()}</div>`;
+
+            const actions = document.createElement('div');
+            actions.style.marginLeft = '8px';
+            actions.style.display = 'flex';
+            actions.style.flexDirection = 'column';
+
+            const markBtn = document.createElement('button');
+            markBtn.textContent = n.read ? 'Read' : 'Mark read';
+            markBtn.className = 'btn-small';
+            markBtn.style.marginBottom = '6px';
+            markBtn.onclick = async () => {
+                try {
+                    await API.user.markNotificationRead(n._id);
+                    fetchAndRenderNotifications();
+                } catch (e) {
+                    showToast('Failed to mark read', 'error');
+                }
+            };
+
+            actions.appendChild(markBtn);
+
+            // If it's a team_request and current user is likely leader, show link to view requests
+            if (n.type === 'team_request' && n.team) {
+                const viewBtn = document.createElement('button');
+                viewBtn.textContent = 'View';
+                viewBtn.className = 'btn-primary btn-small';
+                viewBtn.onclick = () => {
+                    // open requests modal for that team
+                    viewRequests(n.team);
+                    // mark as read
+                    API.user.markNotificationRead(n._id).catch(()=>{});
+                };
+                actions.appendChild(viewBtn);
+            }
+
+            row.appendChild(left);
+            row.appendChild(actions);
+            dropdown.appendChild(row);
+        });
+    }
+
+    // Append to bell container
+    const bell = document.getElementById('notificationsBell');
+    if (bell) bell.appendChild(dropdown);
+
+    // Update unread count
+    const countEl = document.getElementById('notifCount');
+    const unread = notifications.filter(n => !n.read).length;
+    if (countEl) {
+        if (unread > 0) {
+            countEl.style.display = 'inline-block';
+            countEl.textContent = unread;
+        } else {
+            countEl.style.display = 'none';
+        }
+    }
+}
+
+function toggleNotificationsDropdown(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('notifDropdown');
+    if (dropdown) {
+        dropdown.remove();
+    } else {
+        renderNotificationsDropdown(notificationsCache || []);
+        // close on outside click
+        setTimeout(() => {
+            document.addEventListener('click', closeNotifOnOutside);
+        }, 0);
+    }
+}
+
+function closeNotifOnOutside(e) {
+    const dropdown = document.getElementById('notifDropdown');
+    const bell = document.getElementById('notificationsBell');
+    if (!dropdown) return;
+    if (bell && !bell.contains(e.target)) {
+        dropdown.remove();
+        document.removeEventListener('click', closeNotifOnOutside);
     }
 }
 
